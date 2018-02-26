@@ -1,0 +1,164 @@
+<!DOCTYPE html>  
+ <html>  
+      <head>  
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+           <title>Aseman Junatiedot</title>  
+           <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>  
+           <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />  
+           <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>  
+         <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Aseman Junatiedot</title>
+    <style>
+	
+      .navbar{
+        background-color: #56A319;
+        border-bottom-color: #56A319;
+		box-shadow: 3px 3px 3px #888888;
+      }
+
+      .navbar-inverse {
+        background-color: #56A319 !important;
+      }
+
+      .navbar .navbar-brand{
+        color: #FFFFFF;
+      }
+
+	  .tab {
+    background-color: #f1f1f1;
+	margin-top: 80px;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+    color:#56A319;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border-top: none;
+}
+    </style>
+	
+  </head>
+  <body>
+  <!--navbar-->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class ="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand"> <span class="fullName">Aseman Junatiedot</span></a>
+        </div>
+      </div>
+    </div>
+	<!--navbar-->
+	
+	<div class="tab">
+  <button class="tablinks" onclick="openInfo(event, 'saapuvat')">Saapuvat</button>
+  <button class="tablinks" onclick="openInfo(event, 'lahtevat')">Lähtevät</button>
+  <button class="tablinks" onclick="openInfo(event, 'general')">general</button> <!-- ei erottele -->
+</div>
+
+<div id="saapuvat" class="tabcontent">
+<!--JSON data-->
+</div>
+
+<div id="lahtevat" class="tabcontent">
+<!--JSON data-->
+</div>
+
+<div id="general" class="tabcontent">
+<div class ="container-fluid">
+        <div class="navbar-header">
+        </div>
+      </div>          	   
+		   <div class="container">  
+                  <div class="table-responsive">
+                  <br />
+				  <input type="search" class="form-control" id="search"> <br/>
+                    <table class="table table-bordered table-striped" id="tbody">
+                      <tr>
+                        <th>Train</th>
+						<th>Lähtöasema</th>
+						<th>Pääteasema</th>
+						<th>Aika</th>
+                      </tr>
+
+                    </table>
+           </div>  
+         </div>
+
+</div>	       
+</body>
+
+<!-- haku olisi siis jos kirjoittama mätchää stationnamen kanssa ja näyttää milloin tietty juna tulee sinne jonka tiedon saa 
+scheduledtimestä-->
+
+<!--Junan nimi (trainumber ja traintype) -->
+<!--lähtöasema station shortcode(ehkä jopa stationname) ja junan ensimmäinen kohta timetablerowsissa joka saadaan aikaisimmalla scheduledtimellä  -->
+<!--pääteasema station shortcode(ehkä jopa stationname) ja junan viimeinen kohta timetablerowsissa joka saadaan myöhäisimmällä scheduledtimellä -->
+<!--junan aika on scheduledtime ja rajattu stationshortcodella tai jopa stationnamella (scheduledtime if hakun stationname tai 
+stationshortcode mätchää)-->
+
+<!--saapuvat ja lähtevät ero on jos type on arrival tai departure. 
+Eli arrivalissa näyttää milloin junat scheduledtimessä pääsevät sinnä
+Ja departuressa milloin junat scheduled timessä lähtevät sieltä-->
+
+<script>
+function openInfo(evt, infoName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(infoName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+</script>
+
+<script>
+$( document ).ready(function() {
+ $.getJSON("https://rata.digitraffic.fi/api/v1/live-trains/station/HKI/TPE", function(data){ 
+     var output_data = '';
+      $.each(data, function(key, value){
+          output_data += '<tr>';
+          output_data += '<td>'+value.trainType+ +value.trainNumber+'</td>';
+		  //timeTableRows.scheduledtime = Math.min '<td>'(+value.timeTableRows.stationshortcode+)'</td>'; 
+		  //output_data += '<td>''</td>';  timeTableRows.StationShortcode IF Scheduledtime Pienin "jokaisen junan stationshortcode ehdolla pienin scheduledtime"
+		  
+		  //timeTableRows.scheduledtime = Math.max '<td>'(+value.timeTableRows.stationshortcode+)'</td>';
+		  //output_data += '<td>''</td>';  timeTableRows.StationShortcode IF Scheduledtime Isoin "jokaisen junan stationshortcode ehdolla ison scheduledtime"
+		  
+		  //pseudo-koodia
+		  //output_data += '<td>''</td>';  timeTableRows.Scheduledtime	IF Search = "stationshortcode" hausta. Jos ei voi saada aikaa niin NULL. "näyttäisi milloin jokainen juna tulee stationshortcodella haetulle paikalle" */
+          output_data += '</tr>';
+      });
+      $('#tbody').append(output_data);    
+  });
+ });
+ </script>
+</html>
